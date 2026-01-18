@@ -1,0 +1,83 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #ffffff;
+    color: #111111;
+}
+
+/* Brand Colors */
+:root {
+    --brown: #8B5E3C;
+    --dark-brown: #4A2C1A;
+}
+
+/* Buttons */
+.btn-brown {
+    background-color: var(--brown);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-brown:hover {
+    background-color: var(--dark-brown);
+}
+
+/* Section spacing */
+.section {
+    padding: 80px 0;
+}
+
+/* Titles */
+.section-title {
+    color: var(--dark-brown);
+    font-weight: 700;
+}
+
+/* ADMIN LAYOUT */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+    width: 240px;
+    background-color: #4A2C1A;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: block;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background-color: #8B5E3C;
+}
+
+/* MAIN CONTENT */
+.admin-content {
+    flex-grow: 1;
+    background-color: #ffffff;
+    padding: 40px;
+}
