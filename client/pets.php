@@ -39,7 +39,21 @@ $result = mysqli_query($conn, $query);
   </div>
 </nav>
 
-<div class="container section">
+<?php if (isset($_SESSION['toast'])) { ?>
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div class="toast align-items-center text-bg-success border-0 show">
+    <div class="d-flex">
+      <div class="toast-body">
+        <?= $_SESSION['toast']; ?>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+<?php unset($_SESSION['toast']); } ?>
+
+<div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="section-title">My Pets</h2>
@@ -53,7 +67,7 @@ $result = mysqli_query($conn, $query);
             $image = $pet['pet_image'] 
             ? "../assets/uploads/pets/" . $pet['pet_image'] 
             : "../assets/images/default-pet.png";
-    ?>
+        ?>
 
             <div class="col-md-4">
                 <div class="card shadow-md">
@@ -65,15 +79,59 @@ $result = mysqli_query($conn, $query);
                         <h4 class="fw-bold section-title"><?= $pet['pet_name']; ?></h4>
                         <strong>Type:</strong> <?= $pet['pet_type']; ?><br>
                         <strong>Breed:</strong> <?= $pet['breed']; ?><br>
-                        <strong>Age:</strong> <?= $pet['age']; ?><br>
+                        <?php
+                        $months = $pet['age_months'];
+
+                        if ($months < 12) {
+                            $age_display = $months . " month(s)";
+                        } else {
+                            $years = floor($months / 12);
+                            $remaining = $months % 12;
+
+                            $age_display = $years . " year(s)";
+                            if ($remaining > 0) {
+                                $age_display .= " " . $remaining . " month(s)";
+                            }
+                        }
+                        ?>
+
+                        <strong>Age:</strong> <?= $age_display; ?><br>
                         <strong>Special Notes:</strong> <?= $pet['notes']; ?>
                         </p>
 
                         <a href="edit-pet.php?id=<?= $pet['pet_id']; ?>" class="btn btn-sm btn-primary px-3">Edit</a>
-                        <a href="delete-pet.php?id=<?= $pet['pet_id']; ?>" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Delete this pet?')">Delete</a>
+                        <button class="btn btn-sm btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal<?= $pet['pet_id']; ?>">
+                            Delete
+                        </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- DELETE MODAL -->
+            <div class="modal fade" id="deleteModal<?= $pet['pet_id']; ?>" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    Are you sure you want to delete <strong><?= $pet['pet_name']; ?></strong>?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="delete-pet.php?id=<?= $pet['pet_id']; ?>" class="btn btn-danger">
+                        Delete
+                    </a>
+                </div>
+
+                </div>
+            </div>
             </div>
 
         <?php } ?>
@@ -81,6 +139,16 @@ $result = mysqli_query($conn, $query);
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+setTimeout(() => {
+    const toastEl = document.querySelector('.toast');
+    if (toastEl) {
+        bootstrap.Toast.getOrCreateInstance(toastEl).hide();
+    }
+}, 3000);
+</script>
 
 </body>
 </html>

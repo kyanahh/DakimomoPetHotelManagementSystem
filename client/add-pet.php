@@ -8,7 +8,16 @@ if (isset($_POST['save_pet'])) {
     $pet_name = $_POST['pet_name'];
     $pet_type = $_POST['pet_type'];
     $breed    = $_POST['breed'];
-    $age      = $_POST['age'];
+    $age_input = $_POST['age'];
+    $age_unit  = $_POST['age_unit'];
+
+    // Convert everything to MONTHS
+    if ($age_unit === 'years') {
+        $age = $age_input * 12;
+    } else {
+        $age = $age_input;
+    }
+    
     $notes    = $_POST['notes'];
 
     // IMAGE UPLOAD
@@ -20,7 +29,7 @@ if (isset($_POST['save_pet'])) {
         move_uploaded_file($_FILES['pet_image']['tmp_name'], $target);
     }
 
-    $query = "INSERT INTO pets (user_id, pet_name, pet_type, breed, age, notes, pet_image)
+    $query = "INSERT INTO pets (user_id, pet_name, pet_type, breed, age_months, notes, pet_image)
               VALUES ('$user_id', '$pet_name', '$pet_type', '$breed', '$age', '$notes', '$image_name')";
 
     if (mysqli_query($conn, $query)) {
@@ -79,7 +88,16 @@ if (isset($_POST['save_pet'])) {
 
                     <input type="text" name="breed" class="form-control mb-3" placeholder="Breed">
 
-                    <input type="number" name="age" class="form-control mb-3" placeholder="Age">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="number" name="age" class="form-control"
+                                placeholder="Enter pet age" min="0" required>
+                            <select name="age_unit" class="form-select">
+                                <option value="months">Months</option>
+                                <option value="years">Years</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <textarea name="notes" class="form-control mb-3" placeholder="Special Notes"></textarea>
                     

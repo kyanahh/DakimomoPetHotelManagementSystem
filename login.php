@@ -41,8 +41,30 @@ if (isset($_POST['login'])) {
 </head>
 <body>
 
-<div class="container">
-    <div class="row justify-content-center align-items-center" style="min-height:100vh;">
+ <nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="assets/images/logo.png" height="45" class="me-2">
+      <strong>Dakimomo</strong>
+    </a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+        <li class="nav-item">
+          <a class="btn btn-brown ms-3" href="login.php">Book Now</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center" style="min-height:100vh;">
         <div class="col-md-5">
             <div class="card shadow-sm p-4">
                 <h3 class="text-center section-title mb-3">Welcome Back</h3>

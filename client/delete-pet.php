@@ -1,11 +1,17 @@
 <?php
 include '../includes/auth.php';
 include '../includes/db.php';
+session_start();
 
-$pet_id = $_GET['id'];
+if (isset($_GET['id'])) {
+    $pet_id = $_GET['id'];
+    $user_id = $_SESSION['user_id'];
 
-$query = "DELETE FROM pets WHERE pet_id='$pet_id'";
-mysqli_query($conn, $query);
+    mysqli_query($conn, "DELETE FROM pets WHERE pet_id='$pet_id' AND user_id='$user_id'");
+
+    // Set toast message
+    $_SESSION['toast'] = "Pet deleted successfully.";
+}
 
 header("Location: pets.php");
 exit();
