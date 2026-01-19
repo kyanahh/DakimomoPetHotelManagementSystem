@@ -38,7 +38,7 @@ $recentBookings = mysqli_query($conn, "
       <li class="nav-item"><a class="nav-link active" href="dashboard.php">Dashboard</a></li>
       <li class="nav-item"><a class="nav-link" href="pets.php">My Pets</a></li>
       <li class="nav-item"><a class="nav-link" href="my-bookings.php">Bookings</a></li>
-      <li class="nav-item"><a class="nav-link" href="../chat/chat.php">Messages</a></li>
+      <li class="nav-item"><a class="nav-link" href="chat.php">Messages</a></li>
       <li class="nav-item"><a class="nav-link" href="../logout.php">Logout</a></li>
     </ul>
   </div>

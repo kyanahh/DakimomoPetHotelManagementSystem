@@ -6,8 +6,13 @@
 
     <ul class="sidebar-menu">
         <li><a href="dashboard.php">Dashboard</a></li>
+        <li class="nav-item">
+            <a href="users.php" class="nav-link">
+                <i class="bi bi-people"></i> Users
+            </a>
+        </li>
         <li><a href="bookings.php">Bookings</a></li>
-        <li><a href="services.php">Services</a></li>
+        <li><a href="chat.php">Messages</a></li>
         <li><a href="reports.php">Reports</a></li>
         <li class="mt-auto"><a href="../logout.php">Logout</a></li>
     </ul>

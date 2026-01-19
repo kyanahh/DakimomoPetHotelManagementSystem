@@ -29,7 +29,28 @@ if (isset($_POST['register'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body style="background-color: #c8a97e;">
+
+ <nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.php">
+      <img src="assets/images/logo.png" height="45" class="me-2">
+      <strong>Dakimomo</strong>
+    </a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+        <li class="nav-item">
+          <a class="btn btn-brown ms-3" href="login.php">Book Now</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <div class="container">
     <div class="row justify-content-center align-items-center" style="min-height:100vh;">
