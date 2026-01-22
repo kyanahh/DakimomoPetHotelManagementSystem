@@ -12,7 +12,9 @@
             </a>
         </li>
         <li><a href="bookings.php">Bookings</a></li>
+        <li><a href="payments.php">Payments</a></li>
         <li><a href="chat.php">Messages</a></li>
+        <li><a href="chatbot-faqs.php">Chatbot FAQs</a></li>
         <li><a href="reports.php">Reports</a></li>
         <li class="mt-auto"><a href="../logout.php">Logout</a></li>
     </ul>

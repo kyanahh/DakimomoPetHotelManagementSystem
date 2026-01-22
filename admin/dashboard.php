@@ -27,10 +27,10 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn,
    BOOKINGS PER MONTH
 ====================== */
 $monthlyQuery = mysqli_query($conn, "
-    SELECT DATE_FORMAT(booking_date, '%b') AS month, COUNT(*) AS total
+    SELECT DATE_FORMAT(start_date, '%b') AS month, COUNT(*) AS total
     FROM bookings
-    WHERE YEAR(booking_date) = YEAR(CURDATE())
-    GROUP BY MONTH(booking_date)
+    WHERE YEAR(start_date) = YEAR(CURDATE())
+    GROUP BY MONTH(start_date)
 ");
 
 $months = [];
@@ -114,7 +114,7 @@ while ($row = mysqli_fetch_assoc($serviceQuery)) {
     <div class="col-xl-3 col-md-6">
         <div class="card shadow-sm h-100 text-center">
             <div class="card-body">
-                <h6 class="text-muted">Active Clients</h6>
+            <h6 class="text-muted">Active Pet Owners</h6>
                 <h3 class="fw-bold"><?= $activeClients ?></h3>
             </div>
         </div>

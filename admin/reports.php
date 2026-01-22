@@ -2,41 +2,49 @@
 include '../includes/auth.php';
 include '../includes/db.php';
 
-// ADMIN ONLY
+/* ADMIN ONLY */
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
 }
 
-// DATE FILTER
+/* DATE FILTER */
 $from = $_GET['from'] ?? date('Y-m-01');
 $to   = $_GET['to'] ?? date('Y-m-d');
 
-// DAILY BOOKINGS
+/* DAILY BOOKINGS */
 $daily = mysqli_query($conn, "
-    SELECT booking_date, COUNT(*) AS total
+    SELECT start_date, COUNT(*) AS total
     FROM bookings
-    WHERE booking_date BETWEEN '$from' AND '$to'
-    GROUP BY booking_date
+    WHERE start_date BETWEEN '$from' AND '$to'
+    GROUP BY start_date
+    ORDER BY start_date ASC
 ");
 
-// SERVICE USAGE
+/* SERVICE USAGE */
 $services = mysqli_query($conn, "
     SELECT service_type, COUNT(*) AS total
     FROM bookings
-    WHERE booking_date BETWEEN '$from' AND '$to'
+    WHERE start_date BETWEEN '$from' AND '$to'
     GROUP BY service_type
 ");
 
-// STATUS SUMMARY
+/* STATUS SUMMARY */
 $status = mysqli_query($conn, "
     SELECT status, COUNT(*) AS total
     FROM bookings
-    WHERE booking_date BETWEEN '$from' AND '$to'
+    WHERE start_date BETWEEN '$from' AND '$to'
     GROUP BY status
 ");
-?>
 
+/* INCOME SUMMARY */
+$income = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT SUM(total_amount) AS total
+    FROM bookings
+    WHERE payment_status='Fully Paid'
+    AND start_date BETWEEN '$from' AND '$to'
+"));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,12 +56,8 @@ $status = mysqli_query($conn, "
 
 <style>
 @media print {
-    body * {
-        visibility: hidden;
-    }
-    #printArea, #printArea * {
-        visibility: visible;
-    }
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
     #printArea {
         position: absolute;
         left: 0;
@@ -61,12 +65,7 @@ $status = mysqli_query($conn, "
         width: 100%;
         padding: 20px;
     }
-    .no-print {
-        display: none !important;
-    }
-    table {
-        font-size: 12px;
-    }
+    .no-print { display: none !important; }
 }
 </style>
 </head>
@@ -74,7 +73,6 @@ $status = mysqli_query($conn, "
 <body>
 
 <div class="admin-wrapper">
-
 <?php include 'includes/sidebar.php'; ?>
 
 <div class="admin-content px-4">
@@ -86,23 +84,27 @@ $status = mysqli_query($conn, "
 
 <!-- FILTER -->
 <form method="GET" class="row g-3 mb-4 no-print">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label>From</label>
         <input type="date" name="from" class="form-control" value="<?= $from ?>" required>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label>To</label>
         <input type="date" name="to" class="form-control" value="<?= $to ?>" required>
     </div>
-    <div class="col-md-4 d-flex align-items-end">
-        <button class="btn btn-brown me-2">Generate</button>
+    <div class="col-md-6 d-flex align-items-end gap-2">
+        <button class="btn btn-brown">Generate Report</button>
         <button type="button" onclick="printReport()" class="btn btn-dark">
             🖨 Print
         </button>
+        <a href="reports-download.php?from=<?= $from ?>&to=<?= $to ?>"
+           class="btn btn-success">
+            ⬇ Download CSV
+        </a>
     </div>
 </form>
 
-<!-- PRINTABLE AREA -->
+<!-- ================= PRINTABLE AREA ================= -->
 <div id="printArea">
 
 <!-- REPORT HEADER -->
@@ -117,9 +119,13 @@ $status = mysqli_query($conn, "
     <hr>
 </div>
 
+<!-- SUMMARY -->
+<h5 class="fw-bold mb-3">📌 Summary</h5>
+<p><strong>Total Income:</strong> ₱<?= number_format($income['total'] ?? 0,2); ?></p>
+
 <!-- DAILY BOOKINGS -->
-<h5 class="fw-bold mb-2">📅 Daily Booking Report</h5>
-<table class="table table-bordered mb-4">
+<h5 class="fw-bold mt-4 mb-2">📅 Daily Booking Report</h5>
+<table class="table table-bordered">
 <thead class="table-light">
 <tr>
     <th>Date</th>
@@ -129,7 +135,7 @@ $status = mysqli_query($conn, "
 <tbody>
 <?php while ($d = mysqli_fetch_assoc($daily)) { ?>
 <tr>
-    <td><?= date("M d, Y", strtotime($d['booking_date'])) ?></td>
+    <td><?= date("M d, Y", strtotime($d['start_date'])) ?></td>
     <td><?= $d['total'] ?></td>
 </tr>
 <?php } ?>
@@ -137,8 +143,8 @@ $status = mysqli_query($conn, "
 </table>
 
 <!-- SERVICE USAGE -->
-<h5 class="fw-bold mb-2">🐾 Service Usage Summary</h5>
-<table class="table table-bordered mb-4">
+<h5 class="fw-bold mt-4 mb-2">🐾 Service Usage Summary</h5>
+<table class="table table-bordered">
 <thead class="table-light">
 <tr>
     <th>Service</th>
@@ -156,8 +162,8 @@ $status = mysqli_query($conn, "
 </table>
 
 <!-- STATUS SUMMARY -->
-<h5 class="fw-bold mb-2">📊 Booking Status Summary</h5>
-<table class="table table-bordered mb-4">
+<h5 class="fw-bold mt-4 mb-2">📊 Booking Status Summary</h5>
+<table class="table table-bordered">
 <thead class="table-light">
 <tr>
     <th>Status</th>
@@ -176,13 +182,12 @@ $status = mysqli_query($conn, "
 
 <!-- SIGNATURE -->
 <div class="mt-5">
-    <p>Prepared by:</p>
-    <br>
+    <p>Prepared by:</p><br>
     <strong>______________________________</strong><br>
     <small>Administrator</small>
 </div>
 
-</div> <!-- END PRINT AREA -->
+</div><!-- END PRINT AREA -->
 
 </div>
 </div>

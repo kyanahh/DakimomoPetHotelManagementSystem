@@ -17,7 +17,6 @@ if ($_SESSION['role'] !== 'client') {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-/* CHAT LAYOUT */
 .chat-wrapper {
     height: calc(100vh - 120px);
     display: flex;
@@ -37,90 +36,104 @@ if ($_SESSION['role'] !== 'client') {
     background: #f5f5f5;
 }
 
-/* MESSAGE BUBBLES */
 .bubble {
     max-width: 70%;
     padding: 10px 14px;
     border-radius: 15px;
     margin-bottom: 10px;
     font-size: 14px;
-    position: relative;
 }
 
 .bubble.client {
     background: #c8a97e;
     color: #fff;
     margin-left: auto;
-    border-bottom-right-radius: 3px;
 }
 
 .bubble.support {
     background: #fff;
     border: 1px solid #ddd;
     margin-right: auto;
-    border-bottom-left-radius: 3px;
 }
 
-.timestamp {
-    font-size: 11px;
-    opacity: 0.7;
-    margin-top: 4px;
-    text-align: right;
-}
-
-/* INPUT AREA */
 .chat-input {
     border-top: 1px solid #ddd;
     padding: 10px;
     background: #fff;
 }
+
+.quick-btn {
+    margin: 4px;
+}
 </style>
 </head>
+
 <body style="background-color: #c8a97e;">
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="dashboard.php">Dakimomo</a>
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="pets.php">My Pets</a></li>
-      <li class="nav-item"><a class="nav-link" href="my-bookings.php">Bookings</a></li>
-      <li class="nav-item"><a class="nav-link active" href="chat.php">Messages</a></li>
-      <li class="nav-item"><a class="nav-link" href="../logout.php">Logout</a></li>
-    </ul>
-  </div>
+<div class="container">
+<a class="navbar-brand fw-bold" href="dashboard.php">Dakimomo</a>
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>
+<li class="nav-item"><a class="nav-link" href="pets.php">My Pets</a></li>
+<li class="nav-item"><a class="nav-link" href="my-bookings.php">Bookings</a></li>
+<li class="nav-item"><a class="nav-link active" href="chat.php">Messages</a></li>
+<li class="nav-item"><a class="nav-link" href="../logout.php">Logout</a></li>
+</ul>
+</div>
 </nav>
 
 <div class="container mt-4 d-flex justify-content-center">
 <div class="card shadow-sm col-sm-8">
 <div class="chat-wrapper">
 
-    <!-- HEADER -->
-    <div class="chat-header">
-        💬 Dakimomo Support
-    </div>
+<!-- HEADER -->
+<div class="chat-header d-flex justify-content-between align-items-center">
+<span>💬 Dakimomo Support</span>
+<button class="btn btn-sm btn-outline-dark" onclick="toggleBot()">
+🤖 FAQ Bot
+</button>
+</div>
 
-    <!-- CHAT MESSAGES -->
-    <div id="chatBox" class="chat-box">
-        <p class="text-muted text-center">Start chatting with Dakimomo Support</p>
-    </div>
+<!-- CHATBOT (HIDDEN BY DEFAULT) -->
+<div id="chatbotBox" class="chat-box d-none">
+<div class="bubble support">
+Hi! 👋 I’m Dakimomo’s virtual assistant. How can I help you?
+</div>
 
-    <!-- INPUT -->
-    <form id="chatForm" class="chat-input d-flex">
-        <input type="text" id="message" class="form-control me-2"
-               placeholder="Type a message..." required>
-        <button class="btn btn-dark">Send</button>
-    </form>
+<div class="mt-2">
+<button class="btn btn-sm btn-secondary quick-btn" onclick="askBot('services')">Services</button>
+<button class="btn btn-sm btn-secondary quick-btn" onclick="askBot('pricing')">Pricing</button>
+<button class="btn btn-sm btn-secondary quick-btn" onclick="askBot('booking')">How to Book</button>
+<button class="btn btn-sm btn-secondary quick-btn" onclick="askBot('payment')">Payment</button>
+</div>
+</div>
+
+<!-- HUMAN CHAT (DEFAULT – UNCHANGED) -->
+<div id="humanChatBox" class="chat-box">
+<div id="chatBox">
+<p class="text-muted text-center">Start chatting with Dakimomo Support</p>
+</div>
+</div>
+
+<!-- INPUT (UNCHANGED) -->
+<form id="chatForm" class="chat-input d-flex">
+<input type="text" id="message" class="form-control me-2"
+       placeholder="Type a message..." required>
+<button class="btn btn-dark">Send</button>
+</form>
 
 </div>
 </div>
 </div>
 
 <script>
-const chatBox = document.getElementById('chatBox');
+const chatBox  = document.getElementById('chatBox');
+const humanBox = document.getElementById('humanChatBox');
+const botBox   = document.getElementById('chatbotBox');
 
-/* LOAD MESSAGES */
+/* LOAD HUMAN CHAT MESSAGES (UNCHANGED) */
 function loadMessages() {
     fetch('fetch-messages.php')
         .then(res => res.text())
@@ -130,25 +143,77 @@ function loadMessages() {
         });
 }
 
-/* SEND MESSAGE */
+/* SEND HUMAN MESSAGE (UNCHANGED) */
 document.getElementById('chatForm').addEventListener('submit', e => {
     e.preventDefault();
 
-    const msg = document.getElementById('message');
+    const msgInput = document.getElementById('message');
+    const message  = msgInput.value.trim();
 
-    fetch('send-message.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: 'message=' + encodeURIComponent(msg.value)
-    }).then(() => {
-        msg.value = '';
-        loadMessages();
-    });
+    if (message === '') return;
+
+    // BOT MODE
+    if (!botBox.classList.contains('d-none')) {
+
+        // show user message
+        botBox.innerHTML += `
+            <div class="bubble client">${message}</div>
+        `;
+
+        fetch('chatbot-send.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'keyword=' + encodeURIComponent(message)
+        })
+        .then(res => res.text())
+        .then(reply => {
+            botBox.innerHTML += `
+                <div class="bubble support">${reply}</div>
+            `;
+            botBox.scrollTop = botBox.scrollHeight;
+        });
+
+    } 
+    // HUMAN MODE
+    else {
+
+        fetch('send-message.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'message=' + encodeURIComponent(message)
+        }).then(() => {
+            loadMessages();
+        });
+
+    }
+
+    msgInput.value = '';
 });
 
-/* AUTO REFRESH */
+/* AUTO REFRESH (UNCHANGED) */
 setInterval(loadMessages, 3000);
 loadMessages();
+
+/* TOGGLE CHATBOT */
+function toggleBot() {
+    botBox.classList.toggle('d-none');
+    humanBox.classList.toggle('d-none');
+}
+
+/* ASK CHATBOT (FAQ FROM DATABASE) */
+function askBot(keyword) {
+    fetch('chatbot-send.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'keyword=' + encodeURIComponent(keyword)
+    })
+    .then(res => res.text())
+    .then(reply => {
+        botBox.innerHTML += `<div class="bubble support">${reply}</div>`;
+        botBox.scrollTop = botBox.scrollHeight;
+    });
+}
+
 </script>
 
 </body>

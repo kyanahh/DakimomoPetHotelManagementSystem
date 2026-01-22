@@ -10,9 +10,38 @@ $recentBookings = mysqli_query($conn, "
     FROM bookings b
     JOIN pets p ON b.pet_id = p.pet_id
     WHERE b.user_id = '$user_id'
-    ORDER BY b.booking_date DESC
+    ORDER BY b.booking_id DESC
     LIMIT 3
 ");
+
+// TOTAL BOOKINGS
+$totalBookings = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) AS total 
+    FROM bookings 
+    WHERE user_id = '$user_id'
+"))['total'];
+
+// PENDING BOOKINGS
+$pendingBookings = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) AS total 
+    FROM bookings 
+    WHERE user_id = '$user_id' AND status = 'Pending'
+"))['total'];
+
+// APPROVED BOOKINGS
+$approvedBookings = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) AS total 
+    FROM bookings 
+    WHERE user_id = '$user_id' AND status = 'Approved'
+"))['total'];
+
+// REJECTED BOOKINGS
+$rejectedBookings = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) AS total 
+    FROM bookings 
+    WHERE user_id = '$user_id' AND status = 'Rejected'
+"))['total'];
+
 ?>
 
 <!DOCTYPE html>
@@ -51,6 +80,39 @@ $recentBookings = mysqli_query($conn, "
     <div class="mb-4">
         <h2 class="section-title mb-1">Welcome back 👋</h2>
         <p class="text-muted">Manage your pets, bookings, and messages in one place.</p>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Total Bookings</h6>
+                <h2 class="fw-bold"><?= $totalBookings ?></h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Pending</h6>
+                <h2 class="fw-bold text-warning"><?= $pendingBookings ?></h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Approved</h6>
+                <h2 class="fw-bold text-success"><?= $approvedBookings ?></h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6 class="text-muted">Cancelled</h6>
+                <h2 class="fw-bold text-danger"><?= $rejectedBookings ?></h2>
+            </div>
+        </div>
+
     </div>
 
     <!-- ACTION CARDS -->
@@ -143,14 +205,20 @@ $recentBookings = mysqli_query($conn, "
                                 <tr>
                                     <td><?= htmlspecialchars($row['pet_name']); ?></td>
                                     <td><?= htmlspecialchars($row['service_type']); ?></td>
-                                    <td><?= date("M d, Y", strtotime($row['booking_date'])); ?></td>
                                     <td>
-                                        <?php if ($row['status'] == 'Pending') { ?>
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        <?php } elseif ($row['status'] == 'Approved') { ?>
-                                            <span class="badge bg-success">Approved</span>
-                                        <?php } else { ?>
-                                            <span class="badge bg-danger">Rejected</span>
+                                        <?= date("M d, Y", strtotime($row['start_date'])) ?>
+                                        –
+                                        <?= date("M d, Y", strtotime($row['end_date'])) ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($row['status'] == 'Reserved') { ?>
+                                            <span class="badge bg-primary text-dark">Booked</span>
+                                        <?php } elseif ($row['status'] == 'Confirmed') { ?>
+                                            <span class="badge bg-success">Confirmed</span>
+                                        <?php } elseif ($row['status'] == 'Completed') { ?>
+                                            <span class="badge bg-dark">Completed</span>
+                                        <?php } elseif ($row['status'] == 'Rejected') { ?>
+                                            <span class="badge bg-danger">Cancelled</span>
                                         <?php } ?>
                                     </td>
                                 </tr>
