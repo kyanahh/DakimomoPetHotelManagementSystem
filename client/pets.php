@@ -106,8 +106,19 @@ $result = mysqli_query($conn, "SELECT * FROM pets WHERE user_id='$user_id'");
 
         <!-- BADGES -->
         <div class="pet-meta mb-2">
-            <span class="badge bg-secondary"><?= htmlspecialchars($pet['pet_type']); ?></span>
-            <span class="badge bg-info text-dark"><?= htmlspecialchars($pet['pet_size']); ?></span>
+            <span class="badge bg-secondary">
+                <?= htmlspecialchars($pet['pet_type']); ?>
+            </span>
+
+            <span class="badge bg-info text-dark">
+                <?= htmlspecialchars($pet['pet_size']); ?>
+            </span>
+
+            <?php if (!empty($pet['gender'])) { ?>
+                <span class="badge bg-<?= $pet['gender'] === 'Male' ? 'primary' : 'danger'; ?>">
+                    <?= $pet['gender'] === 'Male' ? '♂ Male' : '♀ Female'; ?>
+                </span>
+            <?php } ?>
         </div>
 
         <div class="row small text-muted mb-2">

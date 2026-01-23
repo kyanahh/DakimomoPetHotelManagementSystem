@@ -32,7 +32,7 @@ $pet = mysqli_fetch_assoc($pet);
 
 /* RELATED BOOKINGS */
 $bookings = mysqli_query($conn, "
-    SELECT booking_id, service_type, start_date, end_date, status
+    SELECT booking_id, pet_id, service_type, start_date, end_date, status
     FROM bookings
     WHERE pet_id = $pet_id
     ORDER BY start_date DESC
@@ -40,10 +40,11 @@ $bookings = mysqli_query($conn, "
 
 /* CARE UPDATES */
 $updates = mysqli_query($conn, "
-    SELECT *
-    FROM pet_care_updates
-    WHERE pet_id = $pet_id
-    ORDER BY created_at DESC
+    SELECT u.*
+    FROM pet_care_updates u
+    JOIN bookings b ON u.booking_id = b.booking_id
+    WHERE b.pet_id = $pet_id
+    ORDER BY u.created_at DESC
 ");
 ?>
 <!DOCTYPE html>
@@ -97,14 +98,22 @@ $image = $pet['pet_image']
 
 <hr>
 
-<p><span class="info-label">Species:</span> <?= $pet['pet_type']; ?></p>
+<p><span class="info-label">Species:</span> <?= htmlspecialchars($pet['pet_type']); ?></p>
+
+<p>
+    <span class="info-label">Gender:</span>
+    <?= $pet['gender'] === 'Male' ? '♂ Male' : '♀ Female'; ?>
+</p>
+
 <p><span class="info-label">Breed:</span> <?= $pet['breed'] ?: '—'; ?></p>
-<p><span class="info-label">Size:</span> <?= $pet['pet_size']; ?></p>
+
+<p><span class="info-label">Size:</span> <?= htmlspecialchars($pet['pet_size']); ?></p>
+
 <p><span class="info-label">Age:</span>
 <?php
 $months = (int)$pet['age_months'];
 if ($months >= 12) {
-    echo floor($months/12) . " year(s)";
+    echo floor($months / 12) . " year(s)";
 } else {
     echo $months . " month(s)";
 }
@@ -193,8 +202,8 @@ Update Status
 <?php if (mysqli_num_rows($updates) > 0) { ?>
 <?php while ($u = mysqli_fetch_assoc($updates)) { ?>
 <div class="border-start border-4 ps-3 mb-3">
-<span class="badge bg-primary"><?= $u['status']; ?></span>
-<p class="mb-1"><?= nl2br(htmlspecialchars($u['remarks'])); ?></p>
+<span class="badge bg-primary"><?= $u['status_title']; ?></span>
+<p class="mb-1"><?= nl2br(htmlspecialchars($u['status_message'])); ?></p>
 <small class="text-muted">
 <?= date("M d, Y h:i A", strtotime($u['created_at'])); ?>
 </small>

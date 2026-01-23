@@ -12,6 +12,7 @@ if (isset($_POST['save_pet'])) {
     $age_unit  = $_POST['age_unit'];
     $pet_size  = $_POST['pet_size'];
     $medications  = $_POST['medications'];
+    $gender  = $_POST['gender'];
 
     $age = ($age_unit === 'years') ? $age_input * 12 : $age_input;
     $notes = $_POST['notes'];
@@ -28,10 +29,12 @@ if (isset($_POST['save_pet'])) {
     mysqli_query($conn, "
         INSERT INTO pets (
             user_id, pet_name, pet_type, breed,
-            age_months, notes, pet_image, pet_size, medications
+            age_months, notes, pet_image,
+            pet_size, medications, gender
         ) VALUES (
             '$user_id','$pet_name','$pet_type','$breed',
-            '$age','$notes','$image_name','$pet_size','$medications'
+            '$age','$notes','$image_name',
+            '$pet_size','$medications','$gender'
         )
     ");
 
@@ -114,6 +117,17 @@ if (isset($_POST['save_pet'])) {
             <option>Small</option>
             <option>Medium</option>
             <option>Large</option>
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Gender</label>
+        <select name="gender" class="form-select" required>
+            <option disabled selected>Select gender</option>
+            <option value="Male">♂ Male</option>
+            <option value="Female">♀ Female</option>
         </select>
     </div>
 </div>

@@ -17,6 +17,7 @@ $bookings = mysqli_query($conn, "
         b.end_date,
         b.status,
         p.pet_name,
+        p.pet_id,
         u.full_name
     FROM bookings b
     JOIN pets p ON b.pet_id = p.pet_id
@@ -57,6 +58,7 @@ $bookings = mysqli_query($conn, "
 <table class="table table-hover align-middle mb-0">
 <thead class="table-light">
 <tr>
+    <th>Pet ID</th>
     <th>Pet</th>
     <th>Owner</th>
     <th>Service</th>
@@ -82,6 +84,7 @@ $statusBadge = $b['status'] === 'Confirmed'
 ?>
 
 <tr>
+<td class="fw-semibold"><?= htmlspecialchars($b['pet_id']) ?></td>
 <td class="fw-semibold"><?= htmlspecialchars($b['pet_name']) ?></td>
 <td><?= htmlspecialchars($b['full_name']) ?></td>
 <td><?= htmlspecialchars($b['service_type']) ?></td>
@@ -96,10 +99,14 @@ $statusBadge = $b['status'] === 'Confirmed'
 </span>
 </td>
 <td class="text-center">
+<a title="View Records" href="pet-records.php?pet_id=<?= $b['pet_id']; ?>"
+   class="btn btn-sm btn-outline-primary">
+<i class="bi bi-eye"></i>
+</a>
 <?php if ($b['status'] == 'Confirmed') { ?>
-    <a href="pet-status.php?booking_id=<?= $b['booking_id'] ?>"
+    <a title="Pet Care Update" href="pet-status.php?booking_id=<?= $b['booking_id'] ?>"
        class="btn btn-sm btn-brown">
-       Update Status
+       <i class="bi bi-clipboard"></i>
     </a>
 <?php } else { ?>
     <span class="text-muted small">—</span>
@@ -117,6 +124,8 @@ $statusBadge = $b['status'] === 'Confirmed'
 
 </div>
 </div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
 </body>
 </html>

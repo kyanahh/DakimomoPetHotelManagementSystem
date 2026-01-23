@@ -42,6 +42,7 @@ if (isset($_POST['update_pet'])) {
     $notes     = $_POST['notes'];
     $pet_size  = $_POST['pet_size'];
     $medications = $_POST['medications'];
+    $gender = $_POST['gender'];
 
     $age = ($age_unit === 'years') ? $age_input * 12 : $age_input;
 
@@ -63,7 +64,8 @@ if (isset($_POST['update_pet'])) {
             age_months='$age',
             notes='$notes',
             pet_size='$pet_size',
-            medications='$medications'
+            medications='$medications',
+            gender='$gender'
             $image_query
         WHERE pet_id='$pet_id' AND user_id='$user_id'
     ");
@@ -155,6 +157,14 @@ if (isset($_POST['update_pet'])) {
             <option <?= $pet['pet_size']=="Large" ? "selected" : ""; ?>>Large</option>
         </select>
     </div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Gender</label>
+    <select name="gender" class="form-select" required>
+        <option value="Male" <?= $pet['gender'] === 'Male' ? 'selected' : ''; ?>>♂ Male</option>
+        <option value="Female" <?= $pet['gender'] === 'Female' ? 'selected' : ''; ?>>♀ Female</option>
+    </select>
 </div>
 
 <div class="mb-3">
